@@ -492,7 +492,9 @@ public class YoutubeListPlay : MonoBehaviour
             videoPlayer.Stop();
             audioSource.Stop();
             audioSource.GetComponent<RawImage>().enabled = false;
-
+            if(masterId.Length != 0){
+                StartCoroutine(SendIndexInfo());
+            }
 
             switch (movieList[currentIndex].fileType)
             {
@@ -530,7 +532,8 @@ public class YoutubeListPlay : MonoBehaviour
 
     public void PrepareAutoSkip(){
         float prefSkipTime = PlayerPrefs.GetInt("autoSkipSecond",360);
-        if(!IsNextMovieExists() || PlayerPrefs.GetInt("autoSkipEnabled",0) == 0 || currentStatus != CurrentStatus.playing){
+        int prefStack = PlayerPrefs.GetInt("autoSkipStack",1);
+        if(movieList.Count - currentIndex < prefStack || PlayerPrefs.GetInt("autoSkipEnabled",0) == 0 || currentStatus != CurrentStatus.playing){
             skipTime = (float)Double.MaxValue;
             length = endTime - startTime;
             return;
@@ -541,7 +544,13 @@ public class YoutubeListPlay : MonoBehaviour
             return;
         }
         skipTime = startTime + prefSkipTime;
+
         length = prefSkipTime;
+
+        if(skipTime - elapsedTime < 5){
+            skipTime = elapsedTime + 5;
+            length = skipTime - startTime;
+        }
     }
 
 }

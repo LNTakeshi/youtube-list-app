@@ -37,6 +37,9 @@ public class ButtonController : BaseButtonController
             case "AutoSkipTimeInputField":
                 AutoSkipTimeInputFieldEdit(gameObject);
                 break;
+            case "AutoSkipStackInputField":
+                AutoSkipStackInputFieldEdit(gameObject);
+                break;
             default:
                 throw new System.Exception("Not implemented!!");
 
@@ -51,7 +54,6 @@ public class ButtonController : BaseButtonController
             dict.TryGetValue("YoutubeListPlayer", out obj);
             bool enable = gameObject.GetComponent<Toggle>().isOn;
             PlayerPrefs.SetInt("autoSkipEnabled",enable ? 1 : 0);
-            Debug.Log(enable ? 1 : 0);
             PlayerPrefs.Save();
             dict["YoutubeListPlayer"].GetComponent<YoutubeListPlay>().PrepareAutoSkip();
         }
@@ -81,6 +83,24 @@ public class ButtonController : BaseButtonController
         dict["YoutubeListPlayer"].GetComponent<YoutubeListPlay>().PrepareAutoSkip();
     }
 
+    private void AutoSkipStackInputFieldEdit(GameObject gameObject){
+        int stack = 1;
+        try
+        {
+            stack = Int32.Parse(gameObject.GetComponent<InputField>().text);
+        }
+        catch (Exception e)
+        {
+            
+        } 
+        stack = stack > 0 ? stack : 1;
+        gameObject.GetComponent<InputField>().text = stack.ToString();
+        PlayerPrefs.SetInt("autoSkipStack", stack);
+        PlayerPrefs.Save();
+
+        dict["YoutubeListPlayer"].GetComponent<YoutubeListPlay>().PrepareAutoSkip();
+    }
+
     private void SubmitRoomButtonClick()
     {
         Debug.Log("Button1 Click");
@@ -91,8 +111,8 @@ public class ButtonController : BaseButtonController
 
         youtubeListPlay.startGetJSONCorutine();
         dict["AutoSkipTimeInputField"].GetComponent<InputField>().text = PlayerPrefs.GetInt("autoSkipSecond", 360).ToString();
+        dict["AutoSkipStackInputField"].GetComponent<InputField>().text = PlayerPrefs.GetInt("autoSkipStack", 1).ToString();
         dict["AutoSkipToggle"].GetComponent<Toggle>().isOn = PlayerPrefs.GetInt("autoSkipEnabled",0) == 1;
-        Debug.Log(PlayerPrefs.GetInt("autoSkipEnabled",0) );
         
         dict["CreateRoomObject"].SetActive(false);
         dict["InactiveObject"].SetActive(true);
