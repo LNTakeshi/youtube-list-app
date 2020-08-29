@@ -1,4 +1,5 @@
-﻿using Windows = System.Diagnostics;
+﻿using System.Text;
+using Windows = System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Net.Mime;
 using System.Dynamic;
@@ -15,6 +16,7 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using MiniJSON;
 using Asyncoroutine;
+using System.Linq;
 
 
 public class YoutubeListPlay : MonoBehaviour
@@ -36,6 +38,8 @@ public class YoutubeListPlay : MonoBehaviour
         public string username;
         public string title;
         public string url;
+        public bool isSkip;
+        public int length;
     }
 
     private string roomId = "";
@@ -60,6 +64,8 @@ public class YoutubeListPlay : MonoBehaviour
     private GameObject inactiveObject;
     [SerializeField]
     private GameObject videoController;
+    [SerializeField]
+    private NicoCommentController nicoCommentController;
 
     private AudioClip audioClip;
 
@@ -81,6 +87,7 @@ public class YoutubeListPlay : MonoBehaviour
     private float startTime;
     private float length;
     private float skipTime = (float)Double.MaxValue;
+    public Boolean isNicoLoginSuccess { get; private set;} = false;
 
     private void Update () {
         elapsedTime += Time.deltaTime;
@@ -88,16 +95,13 @@ public class YoutubeListPlay : MonoBehaviour
             Debug.Log("ファイル再生準備開始");
             currentStatus = CurrentStatus.loading;
 
-            if(!IsFileExist(movieList[currentIndex].filePath)){
+            if(!IsFileExist(movieList[currentIndex].filePath) || IsNextMovieSkipped()){
                 Debug.Log("ファイルなし");
-                titlePanel.transform.Find("TitleText").GetComponent<Text>().text = "再生失敗のためスキップされました：" +movieList[currentIndex].title;
+                titlePanel.transform.Find("TitleText").GetComponent<Text>().text = (IsNextMovieSkipped() ? "スキップされました：" : "再生失敗のためスキップされました：") +movieList[currentIndex].title;
                 titlePanel.transform.Find("InfoText").GetComponent<Text>().text = movieList[currentIndex].username;
                 StartCoroutine(ShowTitlePanel());
                 currentIndex++;
-                currentStatus = CurrentStatus.waiting;
-
-                videoPlayer.Stop();
-                audioSource.Stop();
+                StopPlaying();
                 return;
             }
             Debug.Log("動画読み込み");
@@ -115,7 +119,7 @@ public class YoutubeListPlay : MonoBehaviour
                     videoPlayer.Prepare();
                     break;
                 case FileType.sound:
-                    audioSource.gameObject.SetActive(true);
+                    audioSource.GetComponent<RawImage>().enabled = true;
                     infoPanel.SetActive(true);
                     Debug.Log("音声");
                     StartCoroutine(LoadSoundAndPlay());
@@ -126,11 +130,10 @@ public class YoutubeListPlay : MonoBehaviour
 
         }
 
-        if(currentStatus == CurrentStatus.waiting && (videoPlayerObject.activeSelf == true || audioSource.gameObject.activeSelf == true)){
+        if(currentStatus == CurrentStatus.waiting && (videoPlayerObject.activeSelf == true || audioSource.GetComponent<RawImage>().enabled == true)){
             videoPlayerObject.SetActive(false);
             infoPanel.SetActive(false);
-            audioSource.gameObject.SetActive(false);
-
+            audioSource.GetComponent<RawImage>().enabled = false;
         }
 
         if(videoPlayerObject.activeSelf == true && currentIndex != 0 && movieList[currentIndex - 1].fileType == FileType.movie && !Double.IsNaN(videoPlayer.time / length)){
@@ -147,19 +150,13 @@ public class YoutubeListPlay : MonoBehaviour
 
         if(currentStatus == CurrentStatus.playing && currentIndex != 0 && movieList[currentIndex - 1].fileType == FileType.sound && elapsedTime > endTime){
             Debug.Log("音声による再生停止");
-            currentStatus = CurrentStatus.waiting;
-            videoPlayer.Stop();
-            audioSource.Stop();
-            audioSource.GetComponent<RawImage>().enabled = false;
+            StopPlaying();
 
         }
 
         if(elapsedTime > skipTime){
             Debug.Log("オートスキップ");
-            currentStatus = CurrentStatus.waiting;
-            videoPlayer.Stop();
-            audioSource.Stop();
-            audioSource.GetComponent<RawImage>().enabled = false;
+            StopPlaying();
             skipTime = (float) Double.MaxValue;
         }
         // Debug.Log(movieList.Count);
@@ -171,7 +168,7 @@ public class YoutubeListPlay : MonoBehaviour
             RenderTexture renderTexture = new RenderTexture(Screen.width, Screen.height, 16, RenderTextureFormat.ARGB32);
             videoPlayer.GetComponent<VideoPlayer>().targetTexture = renderTexture;
             videoPlayer.GetComponent<RawImage>().texture = renderTexture;
-            
+            audioSource.gameObject.SetActive(true);
 
      }
     //     // var v = await GetVideoInforationAsync(uri);
@@ -199,6 +196,12 @@ public class YoutubeListPlay : MonoBehaviour
         endTime = elapsedTime + (float)videoPlayer.length;
         length = (float)videoPlayer.length;
         currentStatus = CurrentStatus.playing;
+        try{
+            nicoCommentController.startIfReady(currentIndex);
+        }catch(Exception e){
+            Debug.LogError(e.Message);
+            Debug.LogError(e.StackTrace);
+        }
         currentIndex++;
         PrepareAutoSkip();
         Debug.Log("start:"+ startTime + " end:" + endTime + "length:" + length + "skiptime:" + skipTime);
@@ -212,6 +215,7 @@ public class YoutubeListPlay : MonoBehaviour
 
     private IEnumerator LoadSoundAndPlay(){
         Debug.Log("audioStart");
+        currentStatus = CurrentStatus.loading;
         UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(movieList[currentIndex].filePath,AudioType.OGGVORBIS);
         yield return request.SendWebRequest();
         audioClip = DownloadHandlerAudioClip.GetContent(request);
@@ -259,6 +263,9 @@ public class YoutubeListPlay : MonoBehaviour
                         jsonInfo.username = jsonObj["username"] as string;
                         jsonInfo.title = jsonObj["title"] as string;
                         jsonInfo.url = jsonObj["url"] as string;
+                        string[] length = (jsonObj["length"] as string).Split(':');
+                        if(length.Length == 2) jsonInfo.length = Int32.Parse(length[0]) * 60 + Int32.Parse(length[1]);
+                        jsonInfo.isSkip = (bool)jsonObj["deleted"] ;
                         jsonList.Add(jsonInfo);
                     }
 
@@ -277,7 +284,9 @@ public class YoutubeListPlay : MonoBehaviour
                             movie.fileType = FileType.movie;
                             fileExtension = ".mp4";
                         }
-                        movie.filePath = Application.temporaryCachePath + "/Movies/" + Regex.Replace(movie.title, "[\\/:*\"<>|%?]","") + fileExtension;
+                        DateTime date = DateTime.Now;
+                        
+                        movie.filePath = Application.temporaryCachePath + "/Movies/" + date.ToString("yyyyMMddHHmmss") + fileExtension;
                         string youtubeDlPath = Directory.GetCurrentDirectory() + "/youtube-dl.exe";
                         Debug.Log(movie.filePath);
 
@@ -285,7 +294,38 @@ public class YoutubeListPlay : MonoBehaviour
                         pInfo.FileName = youtubeDlPath;
                         if(jsonList[loadingIndex].url.StartsWith("https://www.nicovideo.jp") || jsonList[loadingIndex].url.StartsWith("https://sp.nicovideo.jp")){
                             pInfo.Arguments = "-o \"" +movie.filePath + "\" --external-downloader aria2c --external-downloader-args \"-c -x 5 -k 2M\" " + jsonList[loadingIndex].url;
-
+                            if(isNicoLoginSuccess){
+                                inactiveObject.transform.Find("StatusText").GetComponent<Text>().text = "コメント取得中";
+                                inactiveObject.transform.Find("TitleText").GetComponent<Text>().text = "NEXT:" + movie.title;
+                                inactiveObject.transform.Find("InfoText").GetComponent<Text>().text = movie.username　!= "" ? movie.username : "お名前未入力";
+                                var url =  jsonList[loadingIndex].url.Split('/').Last();
+                                Debug.Log(url);
+                                UnityWebRequest commentRequest = UnityWebRequest.Get("http://flapi.nicovideo.jp/api/getflv/" + url);
+                                commentRequest.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                                yield return commentRequest.SendWebRequest();
+                                String threadId = null;
+                                String commentServer = null;
+                                var param = GetParams(commentRequest.downloadHandler.text);
+                                param.TryGetValue("thread_id", out threadId);
+                                param.TryGetValue("ms", out commentServer);
+                                Debug.Log( commentRequest.error +" body:" + commentRequest.downloadHandler.text + " thread_id:" + threadId + "ms:" + commentServer);
+                                if(threadId != null){
+                                    int commentCount = 100;
+                                    if(jsonList[loadingIndex].length >= 60) commentCount = 200;
+                                    if(jsonList[loadingIndex].length >= 240) commentCount = 400;
+                                    if(jsonList[loadingIndex].length >= 300) commentCount = 1000; 
+                                    Debug.Log("length:" + length + "count:" + commentCount );
+                                    String form = "<thread res_from=\"-" + commentCount + "\" version=\"20061206\" scores=\"1\" thread=\"" + threadId + "\" />";
+                                    commentRequest =  new UnityWebRequest(commentServer);
+                                    commentRequest.method = "POST";
+                                    commentRequest.uploadHandler = new UploadHandlerRaw( Encoding.UTF8.GetBytes(form));
+                                    commentRequest.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+                                    commentRequest.uploadHandler.contentType = "text/xml; encoding='utf-8'";
+                                    yield return commentRequest.SendWebRequest();
+                                    Debug.Log( commentRequest.error + "body:" + commentRequest.downloadHandler.text + " thread_id:" + threadId + "ms:" + commentServer + " form:" + form);
+                                    nicoCommentController.setComment(loadingIndex, commentRequest.downloadHandler.text);
+                                }
+                            }
                         }else{
                             pInfo.Arguments = "-o \"" +movie.filePath + "\" " + jsonList[loadingIndex].url;
                         }
@@ -351,7 +391,7 @@ public class YoutubeListPlay : MonoBehaviour
 
                 }
             }
-            yield return new WaitForSeconds(IsNextMovieExists() ? 30 : 5);
+            yield return new WaitForSeconds(5);
         }
     }
     
@@ -391,6 +431,15 @@ public class YoutubeListPlay : MonoBehaviour
     {
         if(File.Exists(path)) {
             Debug.Log("ファイルが存在します。");
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool IsNextMovieSkipped ()
+    {
+        if(jsonList[currentIndex].isSkip) {
             return true;
         }
 
@@ -483,36 +532,8 @@ public class YoutubeListPlay : MonoBehaviour
 
     public void SkipMovie(){
         if(IsNextMovieExists()){
-            currentStatus = CurrentStatus.loading;
-
-            if(!IsFileExist(movieList[currentIndex].filePath)){
-                currentIndex++;
-                return;
-            }
-            videoPlayer.Stop();
-            audioSource.Stop();
-            audioSource.GetComponent<RawImage>().enabled = false;
-            if(masterId.Length != 0){
-                StartCoroutine(SendIndexInfo());
-            }
-
-            switch (movieList[currentIndex].fileType)
-            {
-                case FileType.movie:
-                    videoPlayer.url = movieList[currentIndex].filePath;
-                    videoPlayer.isLooping =true;
-                    videoPlayer.Prepare();
-                    break;
-                case FileType.sound:
-                    StartCoroutine(LoadSoundAndPlay());
-                    break;
-                default:
-                    break;
-            }
-
-            titlePanel.transform.Find("TitleText").GetComponent<Text>().text = movieList[currentIndex].title;
-            string nextTitle = movieList.Count <= (currentIndex + 1) ? "なし" : movieList[currentIndex + 1].title;
-            titlePanel.transform.Find("InfoText").GetComponent<Text>().text = "次の動画:" + nextTitle + " 残りスタック:" + (movieList.Count - currentIndex - 1);
+            currentStatus = CurrentStatus.waiting;
+            StopPlaying();
         }
     }
 
@@ -527,7 +548,7 @@ public class YoutubeListPlay : MonoBehaviour
 
         request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
         yield return request.SendWebRequest();
-        Debug.Log(request.error + request.downloadHandler.text);
+        Debug.Log(request.error + request.downloadHandler.text + "request:" + System.Text.Encoding.UTF8.GetString(form.data));
     }
 
     public void PrepareAutoSkip(){
@@ -551,6 +572,28 @@ public class YoutubeListPlay : MonoBehaviour
             skipTime = elapsedTime + 5;
             length = skipTime - startTime;
         }
+    }
+
+    public void StopPlaying(){
+        currentStatus = CurrentStatus.waiting;
+        nicoCommentController.stopComment();
+        videoPlayer.Stop();
+        audioSource.Stop();
+        audioSource.GetComponent<RawImage>().enabled = false;
+
+    }
+
+    static Dictionary<string, string> GetParams(string uri)
+    {
+        var matches = Regex.Matches(uri, @"(([^&=]+)=([^&=#]*))", RegexOptions.Compiled);
+        return matches.Cast<Match>().ToDictionary(
+            m => Uri.UnescapeDataString(m.Groups[2].Value),
+            m => Uri.UnescapeDataString(m.Groups[3].Value)
+        );
+    }
+
+    public void SetNicoCommentEnabled(){
+        this.isNicoLoginSuccess = true;
     }
 
 }
