@@ -169,8 +169,33 @@ public class YoutubeListPlay : MonoBehaviour
             videoPlayer.GetComponent<VideoPlayer>().targetTexture = renderTexture;
             videoPlayer.GetComponent<RawImage>().texture = renderTexture;
             audioSource.gameObject.SetActive(true);
+            Application.logMessageReceived += HandleLog;
 
      }
+
+     	void HandleLog (string condition, string stackTrace, LogType type)
+	{
+		if(type == LogType.Exception){
+            StartCoroutine(sendError(condition, stackTrace));
+        }
+	}
+
+    private IEnumerator sendError(string condition, string stackTrace){
+            WWWForm form = new WWWForm();
+            form.AddField("addVersion", Application.version);
+            form.AddField("sendTime", DateTime.Now.ToLongDateString());
+            form.AddField("condition",condition);
+            form.AddField("stackTrace",stackTrace);
+            form.AddField("roomId", roomId);
+            form.AddField("currentIndex", currentIndex);
+            if(currentIndex < movieList.Count) form.AddField("currentTitle", movieList[currentIndex].title);
+
+            UnityWebRequest request = UnityWebRequest.Post("https://lntk.info/youtube-list/api/youtubelist/sendError", form);
+
+            request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+            yield return request.SendWebRequest();
+
+    }
     //     // var v = await GetVideoInforationAsync(uri);
     //     // if(v == null) return;
 
@@ -295,6 +320,7 @@ public class YoutubeListPlay : MonoBehaviour
                         if(jsonList[loadingIndex].url.StartsWith("https://www.nicovideo.jp") || jsonList[loadingIndex].url.StartsWith("https://sp.nicovideo.jp")){
                             pInfo.Arguments = "-o \"" +movie.filePath + "\" --external-downloader aria2c --external-downloader-args \"-c -x 5 -k 2M\" " + jsonList[loadingIndex].url;
                             if(isNicoLoginSuccess){
+                                pInfo.Arguments += " -u " + PlayerPrefs.GetString("nicoMail") + " -p " + PlayerPrefs.GetString("nicoPassword");
                                 inactiveObject.transform.Find("StatusText").GetComponent<Text>().text = "コメント取得中";
                                 inactiveObject.transform.Find("TitleText").GetComponent<Text>().text = "NEXT:" + movie.title;
                                 inactiveObject.transform.Find("InfoText").GetComponent<Text>().text = movie.username　!= "" ? movie.username : "お名前未入力";
@@ -354,7 +380,7 @@ public class YoutubeListPlay : MonoBehaviour
                             pInfo = new Windows.ProcessStartInfo();
                             string ffmpegPath = Directory.GetCurrentDirectory() + "/ffmpeg/ffmpeg.exe";
                             pInfo.FileName = ffmpegPath;
-                            pInfo.Arguments = "-i \"" +movie.filePath + "\" \"" + movie.filePath + ".ogg\"";
+                            pInfo.Arguments = "-i \"" +movie.filePath + "\" -af \"loudnorm=I=-14:TP=-3:LRA=4\" \"" + movie.filePath + ".ogg\"";
                             pInfo.CreateNoWindow = true; // コンソール・ウィンドウを開かない
                             pInfo.UseShellExecute = false;
                             movie.filePath  += ".ogg";
@@ -364,6 +390,27 @@ public class YoutubeListPlay : MonoBehaviour
                                 while(!p.HasExited){
                                     yield return new WaitForSeconds(1);
                                 }
+                        }else{
+                            pInfo = new Windows.ProcessStartInfo();
+                            string ffmpegPath = Directory.GetCurrentDirectory() + "/ffmpeg/ffmpeg.exe";
+                            pInfo.FileName = ffmpegPath;
+                            pInfo.Arguments = "-i \"" +movie.filePath + "\" -af \"loudnorm=I=-14:TP=-3:LRA=4\" -c:v copy -c:a aac \"" + movie.filePath + ".conv.mp4\"";
+                            pInfo.CreateNoWindow = true; // コンソール・ウィンドウを開かない
+                            pInfo.UseShellExecute = false;
+                            
+
+                            Windows.Process p = Windows.Process.Start(pInfo);
+
+                                while(!p.HasExited){
+                                    yield return new WaitForSeconds(1);
+                                }
+                            try{
+                                File.Delete(movie.filePath);
+                            }catch (Exception e){
+                                Debug.LogError(e.Message);
+                                Debug.LogError(e.StackTrace);
+                            }
+                            movie.filePath  += ".conv.mp4";
                         }
 
 

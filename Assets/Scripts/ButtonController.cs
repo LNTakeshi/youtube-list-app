@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Web;
+using System.IO;
 using System.Text.RegularExpressions;
 
 
@@ -128,6 +129,11 @@ public class ButtonController : BaseButtonController
             NicoSubmitButtonClicked();
         }
 
+        //ちゃんとチェックしないと怒られる
+        if(Directory.Exists(Application.temporaryCachePath + "/Movies/")){
+            Directory.Delete(Application.temporaryCachePath + "/Movies/",true);
+        }
+        YoutubeListPlay.SafeCreateDirectory(Application.temporaryCachePath + "/Movies/");
 
         youtubeListPlay.startGetJSONCorutine();
         dict["AutoSkipTimeInputField"].GetComponent<InputField>().text = PlayerPrefs.GetInt("autoSkipSecond", 360).ToString();
@@ -183,7 +189,7 @@ public class ButtonController : BaseButtonController
         PlayerPrefs.SetString("nicoMail", dict["nicoMailField"].GetComponent<InputField>().text);
         PlayerPrefs.SetString("nicoPassword", dict["nicoPasswordField"].GetComponent<InputField>().text);
         PlayerPrefs.Save();
-        if(Int32.Parse(request.GetResponseHeader("x-niconico-authflag")) == 1){
+        if(Int32.Parse(request.GetResponseHeader("x-niconico-authflag")) >= 1){
             dict["YoutubeListPlayer"].GetComponent<YoutubeListPlay>().SetNicoCommentEnabled();
             dict["nicoMailField"].SetActive(false);
             dict["nicoPasswordField"].SetActive(false);
