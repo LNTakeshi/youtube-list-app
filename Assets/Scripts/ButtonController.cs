@@ -26,11 +26,8 @@ public class ButtonController : BaseButtonController
 
     private void Start() {
         dict = objList.ToDictionary(objectLists => objectLists.name);
-        dict["nicoMailField"].GetComponent<InputField>().text = PlayerPrefs.GetString("nicoMail");
-        dict["nicoPasswordField"].GetComponent<InputField>().text = PlayerPrefs.GetString("nicoPassword");
         dict["spotifyCodeField"].GetComponent<InputField>().text = PlayerPrefs.GetString("spotifyRefreshToken");
         // StartCoroutine(TrySpotifyLogin());
-        StartCoroutine(TryNicoLogin());
         ApplyVsysnc();
     }
 
@@ -79,9 +76,6 @@ public class ButtonController : BaseButtonController
                 break;
             case "AutoSkipStackInputField":
                 AutoSkipStackInputFieldEdit(gameObject);
-                break;
-            case "nicoSubmitButton":
-                NicoSubmitButtonClicked();
                 break;
             case "nicoCommentToggle":
                 NicoCommentToggleClicked(gameObject);
@@ -133,6 +127,12 @@ public class ButtonController : BaseButtonController
         pInfo.Arguments = "/IM youtube-dl.exe /F";
         pInfo.UseShellExecute = false;
         Windows.Process p = Windows.Process.Start(pInfo);
+
+        pInfo = new Windows.ProcessStartInfo();
+        pInfo.FileName = "taskkill";
+        pInfo.Arguments = "/IM ffmpeg.exe /F";
+        pInfo.UseShellExecute = false;
+        p = Windows.Process.Start(pInfo);
     }
 
 
@@ -180,17 +180,23 @@ public class ButtonController : BaseButtonController
         youtubeListPlay.setMasterId(dict["masterIdText"].GetComponent<Text>().text);
 
         //ちゃんとチェックしないと怒られる
+        try{
         if(Directory.Exists(Application.temporaryCachePath + "/Movies/")){
             Directory.Delete(Application.temporaryCachePath + "/Movies/",true);
         }
+        }catch(Exception e){
+            Debug.Log(e.Message);
+            dict["errorText"].GetComponent<Text>().text = "ディレクトリの削除に失敗しました。ffmpegなどが動いている可能性があります。";
+            throw e;
+}
         YoutubeListPlay.SafeCreateDirectory(Application.temporaryCachePath + "/Movies/");
+        dict["CreateRoomObject"].SetActive(false);
 
         youtubeListPlay.startGetJSONCorutine();
         dict["AutoSkipTimeInputField"].GetComponent<InputField>().text = PlayerPrefs.GetInt("autoSkipSecond", 360).ToString();
         dict["AutoSkipStackInputField"].GetComponent<InputField>().text = PlayerPrefs.GetInt("autoSkipStack", 1).ToString();
         dict["AutoSkipToggle"].GetComponent<Toggle>().isOn = PlayerPrefs.GetInt("autoSkipEnabled",0) == 1;
 
-        dict["CreateRoomObject"].SetActive(false);
         dict["InactiveObject"].SetActive(true);
         dict["VideoControllerObject"].SetActive(true);
         dict["RoomNumberText"].GetComponent<Text>().text = "https://lntk.info/"+ dict["RoomIdText"].GetComponent<Text>().text + " にyoutubeのURLを投げつけると再生されます";
@@ -213,56 +219,12 @@ public class ButtonController : BaseButtonController
         StartCoroutine(TrySpotifyLogin());
     }
 
-
-    public void NicoSubmitButtonClicked(){
-
-        StartCoroutine(TryNicoLogin());
-    }
-
     public IEnumerator TrySpotifyLogin(){
         Debug.Log("spotifyLogin");
 
         yield return spotify.NewClient();
     }
-
-
-    public IEnumerator TryNicoLogin(){
-        Debug.Log("nicologin");
-        WWWForm form = new WWWForm();
-        form.AddField("mail_tel", dict["nicoMailField"].GetComponent<InputField>().text);
-        form.AddField("password", dict["nicoPasswordField"].GetComponent<InputField>().text);
-
-        UnityWebRequest request = UnityWebRequest.Post("https://account.nicovideo.jp/api/v1/login", form);
-        request.SetRequestHeader("User-Agent", "youtube-list@LNTakeshi");
-        request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        yield return request.SendWebRequest();
-        var header = String.Join(",", request.GetResponseHeaders().Select(r => r.Key + ":" + r.Value));
-        Debug.Log( request.error + "Set-Cookie:" + header + " form:" + System.Text.Encoding.UTF8.GetString(form.data));
-
-        // request = UnityWebRequest.Get("http://flapi.nicovideo.jp/api/getflv/sm9");
-        // request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-        // yield return request.SendWebRequest();
-        // header = String.Join(",", request.GetResponseHeaders().Select(r => r.Key + ":" + r.Value));
-
-        // String threadId = null;
-        // var param = GetParams(request.downloadHandler.text);
-        // param.TryGetValue("thread_id", out threadId);
-        // Debug.Log( request.error + " Set-Cookie:" + header +" body:" + request.downloadHandler.text + " thread_id:" + threadId +  " form:" + System.Text.Encoding.UTF8.GetString(form.data));
-
-
-        PlayerPrefs.SetString("nicoMail", dict["nicoMailField"].GetComponent<InputField>().text);
-        PlayerPrefs.SetString("nicoPassword", dict["nicoPasswordField"].GetComponent<InputField>().text);
-        PlayerPrefs.Save();
-        if(Int32.Parse(request.GetResponseHeader("x-niconico-authflag")) >= 1){
-            dict["YoutubeListPlayer"].GetComponent<YoutubeListPlay>().SetNicoCommentEnabled(Int32.Parse(request.GetResponseHeader("x-niconico-id")));
-            dict["nicoMailField"].SetActive(false);
-            dict["nicoPasswordField"].SetActive(false);
-            dict["nicoSubmitButton"].SetActive(false);
-        }
-    }
-
-
-
+    
     public void NicoCommentToggleClicked(GameObject gameObject){
         NGType? type = CommentData.NG_RADIO_BUTTONS.Where(b=> b.Value == gameObject.name).FirstOrDefault().Key;
         if(type != null){

@@ -1,17 +1,43 @@
 using System;
-using Windows = System.Diagnostics;
-using System.Net.Mime;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using System.Web;
-using System.IO;
-using System.Text.RegularExpressions;
 using MiniJSON;
 using SpotifyAPI.Web;
+using SpotifyAPI.Web.Http;
+using System.Net;
+using System.Net.Http;
+
+public class Logger : IHTTPLogger
+{
+    public void OnRequest(IRequest request)
+    {
+    }
+
+    public void OnResponse(IResponse response)
+    {
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            sendError(response.Body.ToString());
+        }
+    }
+
+    async void sendError(string message) {
+            var parameters = new Dictionary<string, string>()
+            {
+                { "sendTime", DateTime.Now.ToLongDateString() },
+                { "condition", "SpotifyAPI Error" },
+                { "stackTrace", message },
+            };
+            var content = new FormUrlEncodedContent(parameters);
+            using var client = new HttpClient();
+
+            var result2 = await client.PostAsync("https://lntk.info/youtube-list/api/youtubelist/sendError", content);
+    }
+}
 
 public class Spotify : MonoBehaviour
 {
@@ -25,7 +51,7 @@ public class Spotify : MonoBehaviour
 
     private DateTime lastUpdateDate = DateTime.MinValue;
 
-    public Boolean isEnable = false;
+    public bool isEnable = false;
     [SerializeField]
     private Text errorText;
 
@@ -47,15 +73,25 @@ public class Spotify : MonoBehaviour
         }
 
         accessToken = json["Code"] as string;
-        var c =  new SpotifyClient(accessToken);
+        var config = SpotifyClientConfig.CreateDefault()
+        .WithToken(accessToken)
+        .WithHTTPLogger(new Logger());
+
+
+        var c =  new SpotifyClient(config);
         this.refreshToken = refreshToken;
         client = c;
         var h = c.Player.SeekTo(new PlayerSeekToRequest(0));
         var awaiter = h.GetAwaiter();
+
         yield return new WaitUntil(()=> awaiter.IsCompleted);
         if (h.IsFaulted){
-            errorText.text = "Spotify SeekTo:" + h.Exception.Message;
-            yield return youtubeListPlay.sendError("Spotify SeekTo",h.Exception.Message);
+            errorText.text = "Spotify SeekTo:";
+            foreach (var ex in h.Exception.InnerExceptions)
+            {
+                errorText.text += ex.ToString() +". ";
+                yield return youtubeListPlay.sendError("Spotify SeekTo: " + ex.Message, ex.ToString());
+            }
             yield break;
         }
 
@@ -79,8 +115,12 @@ public class Spotify : MonoBehaviour
                 var c = client.Player.SetRepeat(new PlayerSetRepeatRequest(PlayerSetRepeatRequest.State.Track));
                 yield return new WaitUntil(()=> c.IsCompleted);
                 if (c.IsFaulted){
-                    errorText.text = "Spotify UpdateStatus:" + c.Exception.Message;
-                    yield return youtubeListPlay.sendError("Spotify UpdateStatus", c.Exception.Message);
+                    errorText.text = "Spotify UpdateStatus:";
+                    foreach (var ex in c.Exception.InnerExceptions)
+                    {
+                        errorText.text += ex.ToString() +". ";
+                        yield return youtubeListPlay.sendError("Spotify UpdateStatus: " + ex.Message, ex.ToString());
+                    }
                 }
             }
             yield return new WaitForSeconds(300);
@@ -115,10 +155,14 @@ public class Spotify : MonoBehaviour
         yield return new WaitForSeconds(1);
         var c = client.Player.AddToQueue(new PlayerAddToQueueRequest("spotify:track:" + uri.AbsolutePath.Split('/').Last() ));
         yield return new WaitUntil(()=> c.IsCompleted);
-            if (c.IsFaulted){
-            errorText.text = "Spotify IsCompleted:" + c.Exception.Message;
-            yield return youtubeListPlay.sendError("Spotify PausePlayAddToQueue", c.Exception.Message);
-            StartCoroutine(youtubeListPlay.ShowTitlePanel("Spotify AddToQueue Error", c.Exception.Message));
+        if (c.IsFaulted){
+            errorText.text = "Spotify PausePlayAddToQueue:";
+            foreach (var ex in c.Exception.InnerExceptions)
+            {
+                errorText.text += ex.ToString() +". ";
+                yield return youtubeListPlay.sendError("Spotify PausePlayAddToQueue: " + ex.Message, ex.ToString());
+            }
+            StartCoroutine(youtubeListPlay.ShowTitlePanel("Spotify AddToQueue Error", errorText.text));
             yield break;
         }
     }
@@ -135,10 +179,14 @@ public class Spotify : MonoBehaviour
             yield return new WaitForSeconds(1);
             var c = client.Player.SeekTo(new PlayerSeekToRequest(startTime * 1000));
             yield return new WaitUntil(()=> c.IsCompleted);
-                if (c.IsFaulted){
-                errorText.text = "Spotify IsCompleted:" + c.Exception.Message;
-                yield return youtubeListPlay.sendError("Spotify SeekTo", c.Exception.Message);
-                StartCoroutine(youtubeListPlay.ShowTitlePanel("Spotify SeekTo Error", c.Exception.Message));
+            if (c.IsFaulted){
+                errorText.text = "Spotify SeekTo Error:";
+                foreach (var ex in c.Exception.InnerExceptions)
+                {
+                    errorText.text += ex.ToString() +". ";
+                    yield return youtubeListPlay.sendError("Spotify SeekTo Error: " + ex.Message, ex.ToString());
+                }
+                StartCoroutine(youtubeListPlay.ShowTitlePanel("Spotify AddToQueue Error", errorText.text));
                 yield break;
             }
         }
@@ -148,9 +196,13 @@ public class Spotify : MonoBehaviour
         var c = client.Player.SkipNext();
         yield return new WaitUntil(()=> c.IsCompleted);
         if (c.IsFaulted && !c.Exception.Message.Contains("Restriction violated")){
-            errorText.text = "Spotify ResumePlayback:" + c.Exception.Message;
-            yield return youtubeListPlay.sendError("Spotify ResumePlayback", c.Exception.Message);
-            StartCoroutine(youtubeListPlay.ShowTitlePanel("Spotify ResumePlayback Error", c.Exception.Message));
+            errorText.text = "Spotify ResumePlayback Error:";
+                foreach (var ex in c.Exception.InnerExceptions)
+                {
+                    errorText.text += ex.ToString() +". ";
+                    yield return youtubeListPlay.sendError("Spotify ResumePlayback Error: " + ex.Message, ex.ToString());
+                }
+            StartCoroutine(youtubeListPlay.ShowTitlePanel("Spotify AddToQueue Error", errorText.text));
             yield break;
         }
     }
@@ -191,5 +243,9 @@ public class Spotify : MonoBehaviour
             Debug.LogWarning("Spotify Refresh Token");
             yield return NewClient();
         }
+    }
+
+    public void Send(string error) {
+        StartCoroutine(youtubeListPlay.sendError("Spotify response:", error));
     }
 }

@@ -40,7 +40,7 @@ public class NicoCommentController : MonoBehaviour
     private void Update () {
         elapsedTime += Time.deltaTime;
         if(isPlaying){
-            int currentVpos = (int) ((elapsedTime - startTime) * 100);
+            int currentVpos = (int) ((elapsedTime - startTime) * 1000);
             commentDatas[currentIndex].Where(c=>
                 c.score > ((int)currentNGType)
                 &&
@@ -64,28 +64,26 @@ public class NicoCommentController : MonoBehaviour
 
     }
 
-    public void setComment(int index,String json, int startTime){
+    public void setComment(int index, string json, int startTime){
         commentDatas[index] = new List<CommentData>();
         try{
             //var j = Regex.Unescape(json);
-            var jsonObj =  Json.Deserialize(json) as IList;
+            var jsonObj =  Json.Deserialize(json) as Dictionary<string, object>;
 
-            //データの中身すべてを取得
-            // var rows = table.Elements("chat");
+            var threads = (jsonObj["data"] as Dictionary<string, object>)["threads"] as IList;
 
             //取り出し
-            foreach (Dictionary<string, object> row in jsonObj)
+            foreach (Dictionary<string, object> row in threads)
             {
-                if(!row.ContainsKey("chat")){
-                    continue;
+                foreach (Dictionary<string, object> comment in row["comments"] as IList)
+                {
+                    int vpos = (int)(long)comment["vposMs"];
+                    vpos -= startTime * 100;
+                    if(vpos < 0){
+                        continue;
+                    }
+                    commentDatas[index].Add(new CommentData((string)comment["body"], vpos, comment["commands"] as List<object>, 0));
                 }
-                var chat =(IDictionary) row["chat"];
-                int vpos = (int)(long)chat["vpos"];
-                vpos -= startTime * 100;
-                if(vpos < 0){
-                    continue;
-                }
-                commentDatas[index].Add(new CommentData((string)chat["content"], vpos, (string)chat["mail"], 0));
             }
             //ソート
             commentDatas[index].Sort((a,b)=> a.vpos - b.vpos);
@@ -148,24 +146,21 @@ public class NicoCommentController : MonoBehaviour
 public class CommentData{
     public string comment;
     public int vpos;
-    public string mail;
     public int score;
     public ColorType colorType;
     public CommentType commentType;
-    public CommentData(string comment, int vpos, string mail, int score){
+    public CommentData(string comment, int vpos, IList<object> commands, int score){
         this.comment = comment;
         this.vpos = vpos;
-        this.mail = mail;
         this.score = score;
-        List<string> commands = mail?.Split(' ').ToList() ?? new List<string>();
         this.commentType = CommentType.Normal;
         this.colorType = ColorType.White;
-        commands.ForEach(c=>{
+        foreach(string c in commands){
             CommentType? comType = COMMENT_TYPES.FirstOrDefault(type => type.Value == c).Key;
             if(comType != null) this.commentType = (CommentType) comType;
             ColorType? cType = COLOR_TYPES.FirstOrDefault(type => type.Value.Contains(c)).Key;
             if(cType != null) this.colorType = (ColorType) cType;
-        });
+        };
     }
 
     static public Dictionary<CommentType?, string> COMMENT_TYPES = new Dictionary<CommentType?, string>()

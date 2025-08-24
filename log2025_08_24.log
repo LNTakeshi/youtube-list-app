@@ -1,0 +1,151 @@
+2025-08-24 22:37:14 - [標準出力] [niconico] Requesting session cookies
+[niconico] Logging in
+
+2025-08-24 22:37:14 - [エラー出力] WARNING: External Downloader arguments given without specifying name. The arguments will be given to aria2c
+
+2025-08-24 22:41:50 - [標準出力] [niconico] Extracting URL: https://www.nicovideo.jp/watch/sm9294096
+[niconico] sm9294096: Downloading API JSON
+[niconico] sm9294096: Downloading JSON metadata
+[niconico] sm9294096: Downloading m3u8 information
+[info] sm9294096: Downloading 1 format(s): video-h264-360p+audio-aac-128kbps
+[hlsnative] Downloading m3u8 manifest
+[hlsnative] Fragment downloads will be delegated to aria2c
+[hlsnative] Total fragments: 36
+[download] Destination: C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224140.fvideo-h264-360p.mp4
+[download] Writing temporary cookies file to "C:\Users\dm_ta\AppData\Local\Temp\tmputvr42ty.cookies"
+                                                                               [DL:5.9MiB][#b11985 96KiB/159KiB(60%)][#e2713a 80KiB/285KiB(28%)][#22f080 64KiB                                                                               [DL:6.5MiB][#34da63 480KiB/612KiB(78%)][#4d8f1e 512KiB/646KiB(79%)][#027cec 592                                                                               [DL:6.4MiB][#25ccf7 512KiB/568KiB(90%)][#6ee508 432KiB/446KiB(96%)][#372c3c 400[download] 100% of   15.35MiB in 00:00:03 at 4.34MiB/s
+[hlsnative] Downloading m3u8 manifest
+[hlsnative] Fragment downloads will be delegated to aria2c
+[hlsnative] Total fragments: 36
+[download] Destination: C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224140.faudio-aac-128kbps.mp4
+[download] Writing temporary cookies file to "C:\Users\dm_ta\AppData\Local\Temp\tmphsr47r8t.cookies"
+[download] 100% of    2.69MiB in 00:00:01 at 2.45MiB/s
+[Merger] Merging formats into "C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224140.mp4"
+Deleting original file C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224140.fvideo-h264-360p.mp4 (pass -k to keep)
+Deleting original file C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224140.faudio-aac-128kbps.mp4 (pass -k to keep)
+
+2025-08-24 22:41:50 - [エラー出力] WARNING: External Downloader arguments given without specifying name. The arguments will be given to aria2c
+
+2025-08-24 22:42:06 - [標準出力] 
+2025-08-24 22:42:06 - [エラー出力] ffmpeg version 6.0-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers
+  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-d3d11va --enable-dxva2 --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      58.  2.100 / 58.  2.100
+  libavcodec     60.  3.100 / 60.  3.100
+  libavformat    60.  3.100 / 60.  3.100
+  libavdevice    60.  1.100 / 60.  1.100
+  libavfilter     9.  3.100 /  9.  3.100
+  libswscale      7.  1.100 /  7.  1.100
+  libswresample   4. 10.100 /  4. 10.100
+  libpostproc    57.  1.100 / 57.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:/Users/dm_ta/AppData/Local/Temp/DefaultCompany/youtube-list-app/Movies/20250824224140.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf60.3.100
+  Duration: 00:03:34.48, start: 0.000000, bitrate: 709 kb/s
+  Stream #0:0[0x1](und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 512x384 [SAR 1:1 DAR 4:3], 597 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 103 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #0:1 -> #0:1 (aac (native) -> aac (native))
+Press [q] to stop, [?] for help
+Output #0, mp4, to 'C:/Users/dm_ta/AppData/Local/Temp/DefaultCompany/youtube-list-app/Movies/20250824224140.mp4.conv.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf60.3.100
+  Stream #0:0(und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 512x384 [SAR 1:1 DAR 4:3], q=2-31, 597 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 96000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.3.100 aac
+frame=    0 fps=0.0 q=-1.0 size=       0kB time=00:00:00.00 bitrate=N/A speed=   0x    frame=  248 fps=0.0 q=-1.0 size=       0kB time=00:00:08.20 bitrate=   0.0kbits/s speed=16.4x    frame=  434 fps=433 q=-1.0 size=     512kB time=00:00:14.40 bitrate= 291.3kbits/s speed=14.4x    frame=  671 fps=446 q=-1.0 size=    1024kB time=00:00:22.30 bitrate= 376.2kbits/s speed=14.8x    frame=  920 fps=459 q=-1.0 size=    1536kB time=00:00:30.60 bitrate= 411.2kbits/s speed=15.3x    frame= 1109 fps=442 q=-1.0 size=    2048kB time=00:00:36.90 bitrate= 454.7kbits/s speed=14.7x    frame= 1346 fps=448 q=-1.0 size=    2816kB time=00:00:44.80 bitrate= 514.9kbits/s speed=14.9x    frame= 1544 fps=440 q=-1.0 size=    3328kB time=00:00:51.40 bitrate= 530.4kbits/s speed=14.7x    frame= 1754 fps=437 q=-1.0 size=    3840kB time=00:00:58.40 bitrate= 538.7kbits/s speed=14.6x    frame= 1901 fps=421 q=-1.0 size=    4608kB time=00:01:03.30 bitrate= 596.4kbits/s speed=  14x    frame= 2111 fps=421 q=-1.0 size=    5376kB time=00:01:10.30 bitrate= 626.5kbits/s speed=  14x    frame= 2321 fps=421 q=-1.0 size=    6144kB time=00:01:17.30 bitrate= 651.1kbits/s speed=  14x    frame= 2582 fps=429 q=-1.0 size=    6912kB time=00:01:26.00 bitrate= 658.4kbits/s speed=14.3x    frame= 2801 fps=430 q=-1.0 size=    7680kB time=00:01:33.30 bitrate= 674.3kbits/s speed=14.3x    frame= 3044 fps=433 q=-1.0 size=    8448kB time=00:01:41.40 bitrate= 682.5kbits/s speed=14.4x    frame= 3269 fps=434 q=-1.0 size=    8960kB time=00:01:48.90 bitrate= 674.0kbits/s speed=14.5x    frame= 3464 fps=431 q=-1.0 size=    9472kB time=00:01:55.40 bitrate= 672.4kbits/s speed=14.4x    frame= 3713 fps=435 q=-1.0 size=   10496kB time=00:02:03.70 bitrate= 695.1kbits/s speed=14.5x    frame= 3947 fps=437 q=-1.0 size=   11008kB time=00:02:11.50 bitrate= 685.8kbits/s speed=14.5x    frame= 4190 fps=439 q=-1.0 size=   11776kB time=00:02:19.60 bitrate= 691.0kbits/s speed=14.6x    frame= 4381 fps=436 q=-1.0 size=   12288kB time=00:02:25.96 bitrate= 689.6kbits/s speed=14.5x    frame= 4577 fps=434 q=-1.0 size=   12800kB time=00:02:32.50 bitrate= 687.6kbits/s speed=14.5x    frame= 4811 fps=435 q=-1.0 size=   13568kB time=00:02:40.30 bitrate= 693.4kbits/s speed=14.5x    frame= 5042 fps=436 q=-1.0 size=   14336kB time=00:02:48.00 bitrate= 699.1kbits/s speed=14.5x    frame= 5303 fps=440 q=-1.0 size=   15104kB time=00:02:56.70 bitrate= 700.2kbits/s speed=14.7x    frame= 5567 fps=443 q=-1.0 size=   15872kB time=00:03:05.50 bitrate= 700.9kbits/s speed=14.8x    frame= 5810 fps=445 q=-1.0 size=   16640kB time=00:03:13.60 bitrate= 704.1kbits/s speed=14.8x    frame= 6053 fps=446 q=-1.0 size=   17408kB time=00:03:21.70 bitrate= 707.0kbits/s speed=14.9x    frame= 6273 fps=446 q=-1.0 size=   18176kB time=00:03:29.00 bitrate= 712.4kbits/s speed=14.9x    frame= 6434 fps=442 q=-1.0 Lsize=   19231kB time=00:03:34.49 bitrate= 734.5kbits/s speed=14.7x    
+video:15634kB audio:3383kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 1.125154%
+[aac @ 0000013dd20f45c0] Qavg: 767.979
+
+2025-08-24 22:44:58 - [標準出力] [niconico] Extracting URL: https://www.nicovideo.jp/watch/sm9294096
+[niconico] sm9294096: Downloading API JSON
+[niconico] sm9294096: Downloading JSON metadata
+[niconico] sm9294096: Downloading m3u8 information
+[info] sm9294096: Downloading 1 format(s): video-h264-360p+audio-aac-128kbps
+[hlsnative] Downloading m3u8 manifest
+[hlsnative] Fragment downloads will be delegated to aria2c
+[hlsnative] Total fragments: 36
+[download] Destination: C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224450.fvideo-h264-360p.mp4
+[download] Writing temporary cookies file to "C:\Users\dm_ta\AppData\Local\Temp\tmpwl97o_tm.cookies"
+                                                                               [DL:8.9MiB][#8d586e 336KiB/403KiB(83%)][#64887d 400KiB/417KiB(95%)][#566c75 320                                                                               [DL:9.4MiB][#a7d499 384KiB/498KiB(76%)][#d454f5 432KiB/496KiB(87%)][#b8a9d9 368[download] 100% of   15.35MiB in 00:00:02 at 6.66MiB/s
+[hlsnative] Downloading m3u8 manifest
+[hlsnative] Fragment downloads will be delegated to aria2c
+[hlsnative] Total fragments: 36
+[download] Destination: C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224450.faudio-aac-128kbps.mp4
+[download] Writing temporary cookies file to "C:\Users\dm_ta\AppData\Local\Temp\tmpdidnvm4z.cookies"
+[download] 100% of    2.69MiB in 00:00:01 at 2.53MiB/s
+[Merger] Merging formats into "C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224450.mp4"
+Deleting original file C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224450.fvideo-h264-360p.mp4 (pass -k to keep)
+Deleting original file C:\Users\dm_ta\AppData\Local\Temp\DefaultCompany\youtube-list-app\Movies\20250824224450.faudio-aac-128kbps.mp4 (pass -k to keep)
+
+2025-08-24 22:44:58 - [エラー出力] WARNING: External Downloader arguments given without specifying name. The arguments will be given to aria2c
+
+2025-08-24 22:45:13 - [標準出力] 
+2025-08-24 22:45:13 - [エラー出力] ffmpeg version 6.0-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers
+  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-ffnvcodec --enable-nvdec --enable-nvenc --enable-d3d11va --enable-dxva2 --enable-libvpl --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      58.  2.100 / 58.  2.100
+  libavcodec     60.  3.100 / 60.  3.100
+  libavformat    60.  3.100 / 60.  3.100
+  libavdevice    60.  1.100 / 60.  1.100
+  libavfilter     9.  3.100 /  9.  3.100
+  libswscale      7.  1.100 /  7.  1.100
+  libswresample   4. 10.100 /  4. 10.100
+  libpostproc    57.  1.100 / 57.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:/Users/dm_ta/AppData/Local/Temp/DefaultCompany/youtube-list-app/Movies/20250824224450.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf60.3.100
+  Duration: 00:03:34.48, start: 0.000000, bitrate: 709 kb/s
+  Stream #0:0[0x1](und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 512x384 [SAR 1:1 DAR 4:3], 597 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, stereo, fltp, 103 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+  Stream #0:1 -> #0:1 (aac (native) -> aac (native))
+Press [q] to stop, [?] for help
+Output #0, mp4, to 'C:/Users/dm_ta/AppData/Local/Temp/DefaultCompany/youtube-list-app/Movies/20250824224450.mp4.conv.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf60.3.100
+  Stream #0:0(und): Video: h264 (Main) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 512x384 [SAR 1:1 DAR 4:3], q=2-31, 597 kb/s, 30 fps, 30 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+  Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 96000 Hz, stereo, fltp, 128 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.3.100 aac
+frame=    0 fps=0.0 q=-1.0 size=       0kB time=00:00:00.00 bitrate=N/A speed=   0x    frame=  254 fps=0.0 q=-1.0 size=       0kB time=00:00:08.40 bitrate=   0.0kbits/s speed=16.8x    frame=  455 fps=452 q=-1.0 size=     512kB time=00:00:15.10 bitrate= 277.8kbits/s speed=  15x    frame=  650 fps=429 q=-1.0 size=    1024kB time=00:00:21.60 bitrate= 388.4kbits/s speed=14.3x    frame=  842 fps=415 q=-1.0 size=    1536kB time=00:00:28.00 bitrate= 449.4kbits/s speed=13.8x    frame= 1043 fps=412 q=-1.0 size=    2048kB time=00:00:34.70 bitrate= 483.5kbits/s speed=13.7x    frame= 1232 fps=406 q=-1.0 size=    2560kB time=00:00:41.00 bitrate= 511.5kbits/s speed=13.5x    frame= 1415 fps=399 q=-1.0 size=    3072kB time=00:00:47.10 bitrate= 534.3kbits/s speed=13.3x    frame= 1601 fps=396 q=-1.0 size=    3584kB time=00:00:53.30 bitrate= 550.9kbits/s speed=13.2x    frame= 1742 fps=383 q=-1.0 size=    3840kB time=00:00:58.00 bitrate= 542.4kbits/s speed=12.8x    frame= 1904 fps=377 q=-1.0 size=    4608kB time=00:01:03.40 bitrate= 595.4kbits/s speed=12.6x    frame= 2108 fps=380 q=-1.0 size=    5376kB time=00:01:10.20 bitrate= 627.4kbits/s speed=12.7x    frame= 2337 fps=386 q=-1.0 size=    6144kB time=00:01:17.80 bitrate= 646.9kbits/s speed=12.9x    frame= 2615 fps=399 q=-1.0 size=    6912kB time=00:01:27.10 bitrate= 650.1kbits/s speed=13.3x    frame= 2861 fps=406 q=-1.0 size=    7680kB time=00:01:35.30 bitrate= 660.2kbits/s speed=13.5x    frame= 3075 fps=407 q=-1.0 size=    8448kB time=00:01:42.40 bitrate= 675.8kbits/s speed=13.6x    frame= 3320 fps=412 q=-1.0 size=    8960kB time=00:01:50.60 bitrate= 663.7kbits/s speed=13.7x    frame= 3536 fps=413 q=-1.0 size=    9728kB time=00:01:57.80 bitrate= 676.5kbits/s speed=13.8x    frame= 3752 fps=414 q=-1.0 size=   10496kB time=00:02:05.00 bitrate= 687.9kbits/s speed=13.8x    frame= 3980 fps=416 q=-1.0 size=   11264kB time=00:02:12.60 bitrate= 695.9kbits/s speed=13.9x    frame= 4172 fps=414 q=-1.0 size=   11776kB time=00:02:19.00 bitrate= 694.0kbits/s speed=13.8x    frame= 4391 fps=415 q=-1.0 size=   12288kB time=00:02:26.30 bitrate= 688.1kbits/s speed=13.8x    frame= 4625 fps=418 q=-1.0 size=   13056kB time=00:02:34.10 bitrate= 694.1kbits/s speed=13.9x    frame= 4856 fps=419 q=-1.0 size=   13824kB time=00:02:41.80 bitrate= 699.9kbits/s speed=  14x    frame= 5094 fps=422 q=-1.0 size=   14592kB time=00:02:49.73 bitrate= 704.3kbits/s speed=  14x    frame= 5309 fps=422 q=-1.0 size=   15104kB time=00:02:56.90 bitrate= 699.4kbits/s speed=14.1x    frame= 5522 fps=422 q=-1.0 size=   15872kB time=00:03:04.00 bitrate= 706.7kbits/s speed=14.1x    frame= 5768 fps=424 q=-1.0 size=   16640kB time=00:03:12.20 bitrate= 709.2kbits/s speed=14.1x    frame= 5966 fps=423 q=-1.0 size=   17152kB time=00:03:18.80 bitrate= 706.8kbits/s speed=14.1x    frame= 6197 fps=424 q=-1.0 size=   17920kB time=00:03:26.50 bitrate= 710.9kbits/s speed=14.1x    frame= 6425 fps=425 q=-1.0 size=   18688kB time=00:03:34.10 bitrate= 715.1kbits/s speed=14.2x    frame= 6434 fps=422 q=-1.0 Lsize=   19231kB time=00:03:34.49 bitrate= 734.5kbits/s speed=14.1x    
+video:15634kB audio:3383kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 1.125154%
+[aac @ 00000241f07e45c0] Qavg: 767.979
+

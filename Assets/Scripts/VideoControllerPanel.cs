@@ -23,7 +23,7 @@ public class VideoControllerPanel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -45,7 +45,7 @@ public class VideoControllerPanel : MonoBehaviour
         float startTime = elapsedTime;
         Vector2 pivot = controlPanel.GetComponent<RectTransform>().pivot;
         while(elapsedTime - startTime < 0.5){
-            pivot.x = (elapsedTime - startTime ) * 2; 
+            pivot.x = (elapsedTime - startTime ) * 2;
             controlPanel.GetComponent<RectTransform>().pivot = pivot;
             yield return null;
         }
@@ -62,11 +62,11 @@ public class VideoControllerPanel : MonoBehaviour
 
         startTime = elapsedTime;
         while(elapsedTime - startTime < 0.5){
-            pivot.x = 1 - (elapsedTime - startTime ) * 2; 
+            pivot.x = 1 - (elapsedTime - startTime ) * 2;
             controlPanel.GetComponent<RectTransform>().pivot = pivot;
             yield return null;
         }
-            
+
         pivot.x= 0;
         controlPanel.GetComponent<RectTransform>().pivot = pivot;
 
